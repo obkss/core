@@ -660,6 +660,17 @@ class StudentTransferOutTable extends InstitutionStudentTransfersTable
         }
     }
 
+    public function addAfterSave(EventInterface $event, Entity $entity, ArrayObject $data, ArrayObject $extra)
+    {
+        // POCOR-9846: redirect to view page of record after save, instead of
+        // falling through to AddBehavior's stale default redirect
+        $extra['redirect'][0] = 'view';
+        $extra['redirect'][1] = $this->paramsEncode(['id' => $entity->id]);
+        $queryString = $this->getQueryString();
+        $newQueryString = array_merge($queryString, ['id' => $entity->id]);
+        $extra['redirect']['?']['queryString'] = $this->paramsEncode($newQueryString);
+    }
+
     public function beforeMarshal(EventInterface $event, ArrayObject $data, ArrayObject $options)
     {
         foreach (['requested_date', 'start_date', 'end_date'] as $field) {
