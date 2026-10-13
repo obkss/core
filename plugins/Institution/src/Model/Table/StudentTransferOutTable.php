@@ -660,6 +660,22 @@ class StudentTransferOutTable extends InstitutionStudentTransfersTable
         }
     }
 
+    public function addAfterSave(EventInterface $event, Entity $entity, ArrayObject $data, ArrayObject $extra)
+    {
+        // POCOR-9846: addBeforeAction() unconditionally overwrites $extra['redirect'] with a
+        // hardcoded 'StudentUser' action (used for the back button / its own early-exit
+        // redirects). Patching only the [0]/[1] pass params on top of that (as this method
+        // originally did pre-2018) leaves 'action' => 'StudentUser' in place, so the user
+        // lands on StudentUser/view/{transfer id} - which looks up a PERSON by that id,
+        // showing an unrelated profile or a 404. Build a fresh redirect from url('view')
+        // instead, so 'action' correctly stays this table's own controller action.
+        $extra['redirect'] = $this->url('view');
+        $extra['redirect'][1] = $this->paramsEncode(['id' => $entity->id]);
+        $queryString = $this->getQueryString();
+        $newQueryString = array_merge($queryString, ['id' => $entity->id]);
+        $extra['redirect']['?']['queryString'] = $this->paramsEncode($newQueryString);
+    }
+
     public function beforeMarshal(EventInterface $event, ArrayObject $data, ArrayObject $options)
     {
         foreach (['requested_date', 'start_date', 'end_date'] as $field) {
