@@ -50,8 +50,22 @@ class AuditDeletedRecordsTable extends AppTable
         $endDate        = $requestData->report_end_date ?? null;
 
         // Convert dates
-        $startDateObj = $this->parseDate($startDate);
-        $endDateObj   = $this->parseDate($endDate) ?? FrozenDate::createFromFormat('d-m-Y', '31-12-' . date('Y'));
+        //POCOR-9860: an unusable date must fail the report, never be quietly
+        //ignored or substituted - either would widen the range beyond what the
+        //user asked for. Only a genuinely EMPTY end date defaults (to year end);
+        //an end date that is present but unparseable is an error, same as the
+        //start date.
+        $startDateObj = $this->parseReportDate($startDate);
+        if (!$startDateObj) {
+            throw new \InvalidArgumentException('Invalid report start date: ' . $startDate);
+        }
+
+        $endDateObj = empty($endDate)
+            ? FrozenDate::createFromFormat('d-m-Y', '31-12-' . date('Y'))
+            : $this->parseReportDate($endDate);
+        if (!$endDateObj) {
+            throw new \InvalidArgumentException('Invalid report end date: ' . $endDate);
+        }
 
         // Base select
         $query
@@ -189,17 +203,5 @@ class AuditDeletedRecordsTable extends AppTable
     }
 
 
-    private function parseDate(?string $date): ?FrozenDate
-    {
-        if (empty($date)) {
-            return null;
-        }
-        $timestamp = strtotime($date);
-        if ($timestamp === false) {
-            return null;
-        }
-
-        return FrozenDate::createFromTimestamp($timestamp);
-    }
 
 }
