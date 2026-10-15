@@ -350,7 +350,9 @@ class StudentAttendanceSummaryTable extends AppTable
     private function getSchoolClosedDate($requestData)
     {
         $filterInstitutionIds = $this->parseFilterInstitutionIds($requestData->institution_id);
-        $institutionList = !empty($filterInstitutionIds) ? $filterInstitutionIds : [$requestData->institution_id];
+        //POCOR-9865
+        $legacyInstitutionId = is_object($requestData->institution_id) || is_array($requestData->institution_id) ? 0 : $requestData->institution_id;
+        $institutionList = !empty($filterInstitutionIds) ? $filterInstitutionIds : [$legacyInstitutionId];
         $startDate = new DateTime($requestData->report_start_date);
         $endDate = new DateTime($requestData->report_end_date);
         $closedDates = $this->getInstitutionClosedDates($startDate, $endDate, $institutionList);
