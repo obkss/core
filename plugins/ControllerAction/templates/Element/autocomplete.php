@@ -40,13 +40,23 @@ $loadingImg = $this->Html->image('OpenEmis.loader.gif', ['plugin' => 'false']);
     });
 
     var Autocomplete = {
-        loadingImg: '',
         uiItems: {},
-        onNoResultsBlockSave: false,  // Default behavior is false // POCOR-8128
 
         // POCOR-9771: hidden value input belonging to the given text input
         hiddenFor: function(input) {
             return $(input).closest('.input').find('input[type=hidden][data-autocomplete-hidden]');
+        },
+
+        // POCOR-9873: spinner belonging to the given text input, so one field's search
+        // does not toggle every other field's spinner on a multi-autocomplete form
+        spinnerFor: function(input) {
+            return $(input).closest('.input').find('.loading_img');
+        },
+
+        // POCOR-9873: read per input instead of latching one shared flag, so a field that
+        // opts in does not disable Save for unrelated fields on the same form
+        blocksSaveOnNoResults: function(input) {
+            return $(input).data('onnoresultsblocksave') === true;
         },
 
         init: function() {
@@ -67,10 +77,10 @@ $loadingImg = $this->Html->image('OpenEmis.loader.gif', ['plugin' => 'false']);
                 $(this).data('caAutocompleteBound', true);
                 Autocomplete.attachAutoComplete(this, Autocomplete.select);
             });
-            loadingImg = $('.loading_img');
-            loadingImg.hide();
-            if (Autocomplete.onNoResultsBlockSave) { // POCOR-8128
-                submitBtn.prop('disabled', true);  // Disable button at init // POCOR-8128
+            $('.loading_img').hide();
+            // POCOR-8128 / POCOR-9873: disable at init only when an input actually opts in
+            if ($('input.autocomplete[data-onnoresultsblocksave="true"]').length > 0) {
+                submitBtn.prop('disabled', true);
             }
         },
 
@@ -130,26 +140,22 @@ $loadingImg = $this->Html->image('OpenEmis.loader.gif', ['plugin' => 'false']);
         },
 
         searchComplete: function(event, ui) {
-            if (loadingImg.length >= 1) {
-                loadingImg.hide();
-                var recordsCount = ui.content.length;
-                var submitBtn = $('button[name=submit]');
+            Autocomplete.spinnerFor(event.target).hide(); // POCOR-9873
+            var recordsCount = ui.content.length;
+            var submitBtn = $('button[name=submit]');
 
-                if (recordsCount === 0) {
-                    submitBtn.text('Create New');
-                    if (Autocomplete.onNoResultsBlockSave) { // POCOR-8128
-                        submitBtn.prop('disabled', true);  // Disable "Save" if no records are found and onNoResultsBlockSave is true
-                    }
-                } else {
-                    submitBtn.text('Save').prop('disabled', false); // POCOR-8128
+            if (recordsCount === 0) {
+                submitBtn.text('Create New');
+                if (Autocomplete.blocksSaveOnNoResults(event.target)) { // POCOR-8128 / POCOR-9873
+                    submitBtn.prop('disabled', true);  // Disable "Save" if no records are found and this input opts in
                 }
+            } else {
+                submitBtn.text('Save').prop('disabled', false); // POCOR-8128
             }
         },
 
         beforeSearch: function(event, ui) {
-            if (loadingImg.length >= 1) {
-                loadingImg.show();
-            }
+            Autocomplete.spinnerFor(event.target).show(); // POCOR-9873
         },
 
         attachAutoComplete: function(element, callback) {
@@ -157,13 +163,6 @@ $loadingImg = $this->Html->image('OpenEmis.loader.gif', ['plugin' => 'false']);
             var $el = $(element);
             var url = $el.attr('url');
             var length = $el.attr('length');
-            // POCOR-8128 start
-            var onNoResultsBlockSave = $el.data('onnoresultsblocksave');  // Get the attribute value from HTML
-            if (onNoResultsBlockSave !== undefined && onNoResultsBlockSave === true) {
-                Autocomplete.onNoResultsBlockSave = true;  // Set the custom flag to block save on no results
-            }
-            // POCOR-8128 end
-
             if (length === undefined) {
                 length = 2;
             }

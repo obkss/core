@@ -80,7 +80,11 @@ class CounsellingsTable extends ControllerActionTable
     {
         $validator = parent::validationDefault($validator);
 
-        return $validator->allowEmpty('file_content');
+        return $validator
+            ->allowEmpty('file_content')
+            // POCOR-9873: the Counselor field is an ajax autocomplete now, and the element cannot
+            // carry the HTML `required` attribute, so enforce it server-side.
+            ->notEmptyString('counselor_id', __('Counselor is required'));
     }
 
     public function getDefaultConfig()
@@ -231,9 +235,11 @@ class CounsellingsTable extends ControllerActionTable
                 'placeholder' => __('OpenEMIS ID, Identity Number or Name')
             ];
 
+            // POCOR-9873: resolve from the current request; this table is reached from more than one
+            // controller (Students / Directories), so a hardcoded controller 404s on the others.
             $attr['url'] = [
-                'controller' => 'Students',
-                'action'     => 'Counsellings',
+                'controller' => $this->controller->getName(),
+                'action'     => $this->getAlias(),
                 'ajaxUserAutocomplete'
             ];
 
@@ -280,9 +286,10 @@ class CounsellingsTable extends ControllerActionTable
                 'required' => true,
                 'placeholder' => __('OpenEMIS ID, Identity Number or Name')
             ]);
+            // POCOR-9873: see onUpdateFieldRequesterId - resolve controller/action from the request.
             $attr['url'] = [
-                'controller' => 'Students',
-                'action'     => 'Counsellings',
+                'controller' => $this->controller->getName(),
+                'action'     => $this->getAlias(),
                 'ajaxCounselorAutocomplete'
             ];
 
