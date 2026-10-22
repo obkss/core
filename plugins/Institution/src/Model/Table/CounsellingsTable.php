@@ -100,6 +100,28 @@ class CounsellingsTable extends ControllerActionTable
         return $guidanceTypesOptions;
     }
 
+    // Still required by the Page-based Institution\Controller\CounsellingsController
+    // (via Counselling\Controller\CounsellingsController::addEditCounselling()), which resolves
+    // $this->Counsellings to this table. The ControllerAction screen uses ajaxCounselorAutocomplete instead.
+    public function getCounselorOptions()
+    {
+        $counselorOptions = $this->Users
+            ->find('list', [
+                'keyField' => 'id',
+                'valueField' => 'name_with_id'
+            ])
+            ->where([
+                $this->Users->aliasField('status') => 1
+            ])
+            ->order([
+                $this->Users->aliasField('first_name'),
+                $this->Users->aliasField('last_name')
+            ])
+            ->toArray();
+
+        return $counselorOptions;
+    }
+
     public function indexBeforeAction(EventInterface $event) {
         
         $this->field('date');
