@@ -23,6 +23,7 @@ class CounsellingsTable extends ControllerActionTable
         $this->setTable('counsellings');
         parent::initialize($config);
 
+        
         // one counselling record can have multiple guidance types, via the counselling_guidance_types join table
 
         //POCOR-9771
