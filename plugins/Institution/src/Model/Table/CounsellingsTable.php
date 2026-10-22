@@ -286,23 +286,25 @@ class CounsellingsTable extends ControllerActionTable
                 'ajaxCounselorAutocomplete'
             ];
 
-            /* EDIT mode: show the currently saved counselor */
-            if ($action === 'edit') {
+            // Show the selected counselor's name in the search box: the posted value (re-render after a
+            // failed save) or, on edit, the stored value. The id itself is rendered from the entity.
+            $counselorId = $request->getData($this->getAlias() . '.counselor_id');
+            if (empty($counselorId) && $action === 'edit' && !$request->is(['post', 'put'])) {
                 $queryString = $this->getQueryString();
                 if (!empty($queryString['id'])) {
                     $record = $this->find()
                         ->select(['counselor_id'])
                         ->where(['id' => $queryString['id']])
                         ->first();
-
-                    if (!empty($record->counselor_id)) {
-                        try {
-                            $user = TableRegistry::get('User.Users')->get($record->counselor_id);
-                            $attr['attr']['value'] = $user->openemis_no . ' - ' . $user->name;
-                        } catch (\Exception $e) {
-                            // user no longer exists; leave the field empty
-                        }
-                    }
+                    $counselorId = $record->counselor_id ?? null;
+                }
+            }
+            if (!empty($counselorId)) {
+                try {
+                    $user = TableRegistry::get('User.Users')->get($counselorId);
+                    $attr['attr']['value'] = $user->openemis_no . ' - ' . $user->name;
+                } catch (\Exception $e) {
+                    // user no longer exists; leave the field empty
                 }
             }
         }
