@@ -69,8 +69,7 @@ class ReportShell extends Shell
                 try {
                     $table->renderExcelTemplate($excelParams);
                 } catch (\Throwable $e) {
-                    $this->printErrorAndSetProcessFault($e, $id);
-                    throw $e;
+                    $table->generateExcelReport($excelParams); //POCOR-9812: template if the report has one, else a plain workbook
                 }
                 // Mark completed (background shell may not trigger event)
                 if ($excelParams->offsetExists('file_path')) {
