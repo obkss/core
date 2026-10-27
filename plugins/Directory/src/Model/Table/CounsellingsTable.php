@@ -28,7 +28,7 @@ class CounsellingsTable extends ControllerActionTable
         //POCOR-9771
         $this->belongsToMany('GuidanceTypes', [
             'className' => 'Student.GuidanceTypes',
-            'joinTable' => 'counselling_guidance_types',
+            'through' => 'Student.CounsellingGuidanceTypes', // use AppTable so created_user_id / created are auto-filled
             'foreignKey' => 'counselling_id',
             'targetForeignKey' => 'guidance_type_id',
             'dependent' => true,
@@ -80,7 +80,14 @@ class CounsellingsTable extends ControllerActionTable
     {
         $validator = parent::validationDefault($validator);
 
-        return $validator->allowEmpty('file_content');
+        return $validator
+            ->allowEmpty('file_content')
+            // date is NOT NULL in counsellings - validate here so a blank date shows a message instead of a DB error
+            ->requirePresence('date', 'create')
+            ->notEmptyDate('date', __('This field cannot be left empty'))
+            // counselor_id is NOT NULL in counsellings - same reason as date
+            ->requirePresence('counselor_id', 'create')
+            ->notEmptyString('counselor_id', __('This field cannot be left empty'));
     }
 
     public function getDefaultConfig()
