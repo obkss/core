@@ -526,7 +526,7 @@ class ReportListBehavior extends Behavior {
 		}
 		/*POCOR-6439 ends*/
 		//POCOR-9831: short name - the generic one lists every selected institution and can exceed report_progress.name (200)
-		if ($feature == 'Report.StudentAttendanceReport') {
+		if ($feature == 'Report.IndividualStudentsAttendanceReport') {
 			$reportData = $data[$alias];
 			$academicPeriodData = $AcademicPeriod->get($reportData['academic_period_id']);
 			$institutionIds = [];
