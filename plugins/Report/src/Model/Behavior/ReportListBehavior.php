@@ -521,7 +521,7 @@ class ReportListBehavior extends Behavior {
 			} elseif (count($institutionIds) > 1) {
 				$institutionCode = count($institutionIds) . ' ' . __('Institutions');
 			} else {
-				$institutionCode = 'All Institutions';
+				$institutionCode = __('All Institutions');
 			}
 	        if ($data['Institutions']['education_grade_id'] > -1) {
 	        	$EducationGradesData = $EducationGrades->get($data['Institutions']['education_grade_id']);
