@@ -91,7 +91,15 @@ trait StudentCreationCheckTrait
         }
 
         $excludedIds = array_filter(explode(',', $excludedRaw));
-        $userId = method_exists($this, 'getUserID') ? $this->getUserID() : (int)$this->request->getSession()->read('Auth.User.id');
+        //POCOR-9385: the excluded-role check is about the ACTING (logged-in) user, so always read it from the
+        //session. getUserID() on controllers/tables returns the user_id from the query string (the subject
+        //user, e.g. the student) and is null on AJAX calls such as getEducationGrade, which crashed
+        //getSecurityGroupId() ("Users.id is missing operator with null value") and returned an error page
+        //instead of JSON, so the Education Grade dropdown rendered "undefined" options.
+        $userId = (int)$this->request->getSession()->read('Auth.User.id');
+        if ($userId <= 0) {
+            return false; //POCOR-9385: no logged-in user → not excluded
+        }
         $instId = $institutionId ?? (method_exists($this, 'getInstitutionID') ? ($this->getInstitutionID() ?: 0) : 0);
 
         if ($instId > 0) {
