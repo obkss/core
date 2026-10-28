@@ -10,6 +10,7 @@
 	#news .notice-message ul { list-style: disc outside; }
 	#news .notice-message ol { list-style: decimal outside; }
 	#news .notice-message ul ul { list-style-type: circle; }
+	#news .notice-message ul ul ul { list-style-type: square; }
 	#news .notice-message li { display: list-item; }
 </style>
 <h3><?= __('Notices'); ?></h3>

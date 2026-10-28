@@ -151,8 +151,15 @@ class NoticesTable extends ControllerActionTable
         }
     }
 
-    public function viewAfterAction(EventInterface $event, Entity $entity, ArrayObject $extra)
+    public function viewAfterAction(EventInterface $event, Entity|bool|null $entity, ArrayObject $extra)
     {
+        //POCOR-9863: viewBeforeQuery above can legitimately filter the record out (notice disabled,
+        //or no longer assigned to any of the user's roles). ViewBehavior then passes a falsy entity
+        //here and redirects to the index, so bail out before touching $entity.
+        if (!$entity) {
+            return;
+        }
+
         $this->field('status', ['visible' => false]);
         $this->field('notice_status', ['visible' => true]);
         $this->field('security_role_id');
