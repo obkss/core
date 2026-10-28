@@ -233,7 +233,7 @@ class OpenEmisComponent extends Component
             if(!$isAdmin){
                 $userNotices  = TableRegistry::getTableLocator()->get('Alert.SecurityUserNotices');
 
-                //POCOR-9558: same visibility rule as the dashboard and System Notices page
+                //POCOR-9863: same visibility rule as the dashboard and System Notices page
                 $assignedNoticeIds = TableRegistry::getTableLocator()->get('Alert.NoticeRoles')
                     ->getVisibleNoticeIds($userId);
 

@@ -3,7 +3,7 @@
  
 <!-- Angular Sanitize (must match version 1.5.8) -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-sanitize.js"></script>
-<?php //POCOR-9558: restore bullets/numbering in rich-text notice messages (reset.css removes them) ?>
+<?php //POCOR-9863: restore bullets/numbering in rich-text notice messages (reset.css removes them) ?>
 <style>
 	#news .notice-message ul,
 	#news .notice-message ol { padding-inline-start: 20px; margin: 0 0 10px 0; }

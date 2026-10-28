@@ -1,5 +1,5 @@
 <?php $message = html_entity_decode($entity->message); ?>
-<?php //POCOR-9558: reset.css sets "ol, ul { list-style: none; }" and zero padding globally,
+<?php //POCOR-9863: reset.css sets "ol, ul { list-style: none; }" and zero padding globally,
       // so restore list markers for the rich-text (CKEditor) notice message ?>
 <style>
     .notice-content ul,

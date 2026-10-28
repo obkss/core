@@ -41,7 +41,7 @@ class NoticesTable extends AppTable
             ])
         ])->enableHydration(false);
 
-        //POCOR-9558: notices are shown to every user whose role the notice is assigned to.
+        //POCOR-9863: notices are shown to every user whose role the notice is assigned to.
         //The extra "Notice Message" permission check was removed so that role assignment alone decides visibility.
         $query->where([$this->aliasField('status') => 1])
             ->order([$this->aliasField('created') => 'DESC']);

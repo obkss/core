@@ -84,7 +84,7 @@ class NoticesTable extends ControllerActionTable
         $readStatus = $this->request->getQuery('notice_status');
 
         if (!$isSuperAdmin) {
-            //POCOR-9558: show enabled notices assigned to any of the user's roles (no separate permission needed)
+            //POCOR-9863: show enabled notices assigned to any of the user's roles (no separate permission needed)
             $noticeIds = TableRegistry::getTableLocator()->get('Alert.NoticeRoles')->getVisibleNoticeIds($userId);
 
             if (empty($noticeIds)) {
@@ -141,7 +141,7 @@ class NoticesTable extends ControllerActionTable
         }
     }
 
-    //POCOR-9558: non-admin users may only open notices that are addressed to one of their roles
+    //POCOR-9863: non-admin users may only open notices that are addressed to one of their roles
     public function viewBeforeQuery(EventInterface $event, Query $query, ArrayObject $extra)
     {
         if (!$this->Auth->user('super_admin')) {

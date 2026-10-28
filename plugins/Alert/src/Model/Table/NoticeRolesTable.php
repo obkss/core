@@ -26,7 +26,7 @@ class NoticeRolesTable extends ControllerActionTable
     }
 
     /**
-     * POCOR-9558: single rule for who can see a notice.
+     * POCOR-9863: single rule for who can see a notice.
      * A notice is visible to a user when it is enabled (status = 1) and assigned
      * to at least one of the security roles the user holds in any security group.
      *

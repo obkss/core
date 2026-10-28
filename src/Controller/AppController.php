@@ -809,7 +809,7 @@ class AppController extends Controller
         if ($params['controller'] == 'Errors') {
             return $skip;
         }
-        //POCOR-9558: every logged-in user can open their notices inbox; the table filters notices by the user's roles
+        //POCOR-9863: every logged-in user can open their notices inbox; the table filters notices by the user's roles
         if ($params['controller'] == 'Systems' && $params['action'] == 'SystemNotices') {
             return $skip;
         }
