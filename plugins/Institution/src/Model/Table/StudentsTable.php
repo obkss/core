@@ -52,6 +52,7 @@ class StudentsTable extends ControllerActionTable
     //POCOR-9509: refreshed every 10 min — admin change takes effect within 10 min on each worker
     private static ?bool $studentStatusAlertEnabled = null;
     private static int $studentStatusAlertCachedAt = 0;
+    
 
     public function initialize(array $config): void
     {
