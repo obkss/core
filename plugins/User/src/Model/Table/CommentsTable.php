@@ -35,6 +35,21 @@ class CommentsTable extends ControllerActionTable
         $this->addBehavior('User.UserTab');
     }
 
+    // All fields on the Comments add/edit form are mandatory
+    public function validationDefault(Validator $validator): Validator
+    {
+        $validator = parent::validationDefault($validator);
+        return $validator
+            ->requirePresence('comment_type_id', 'create')
+            ->notEmptyString('comment_type_id', __('Please select a Comment Type'))
+            ->requirePresence('title', 'create')
+            ->notEmptyString('title', __('Please enter a Title'))
+            ->requirePresence('comment', 'create')
+            ->notEmptyString('comment', __('Please enter a Comment'))
+            ->requirePresence('comment_date', 'create')
+            ->notEmptyDate('comment_date', __('Please select a Date'));
+    }
+
     // The bootstrap-datepicker "date" field for comment_date renders/accepts text in whatever
     // format is configured in System Configurations > Date Format (e.g. "July 31, 2026"), not just
     // 'Y-m-d'. Cake's DateType::marshal() only ever accepts the strict 'Y-m-d' format, so with any
