@@ -377,10 +377,11 @@ class InstitutionsTable extends ControllerActionTable
 
             // Provider is required: without notEmptyString Cake treats '' (-- Select --) as non-empty
             // and runs checkLinkedSector on it, which threw RecordNotFoundException (404) on Save.
-            ->notEmptyString('institution_provider_id')
+            ->notEmptyString('institution_provider_id', __('Please select a Provider'))
             ->add('institution_provider_id', 'ruleLinkedSector', [
                 'rule' => 'checkLinkedSector',
-                'provider' => 'table'
+                'provider' => 'table',
+                'message' => __('Provider does not belong to the selected Sector')
             ])
 
             ->notEmptyString('address')

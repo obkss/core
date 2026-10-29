@@ -35,7 +35,18 @@ class CommentsTable extends ControllerActionTable
         $this->addBehavior('User.UserTab');
     }
 
-    // All fields on the Comments add/edit form are mandatory
+    /**
+     * POCOR-9883: every field on the Comments Add form is mandatory. Without these rules a
+     * blank field passed validation and died at INSERT time on the NOT NULL column, which is
+     * the error page the ticket reports.
+     *
+     * `title` and `comment` are only required to be non-empty on create. Their columns are
+     * NOT NULL but are strings, and MySQL stores '' quite happily, so existing rows with an
+     * empty body do exist - making the rule unconditional would block those records from
+     * being edited at all. `comment_type_id` and `comment_date` stay unconditional: they are
+     * int/date columns where a blank value marshals to null and crashes the save, so
+     * rejecting it protects edit as well as add.
+     */
     public function validationDefault(Validator $validator): Validator
     {
         $validator = parent::validationDefault($validator);
@@ -43,9 +54,9 @@ class CommentsTable extends ControllerActionTable
             ->requirePresence('comment_type_id', 'create')
             ->notEmptyString('comment_type_id', __('Please select a Comment Type'))
             ->requirePresence('title', 'create')
-            ->notEmptyString('title', __('Please enter a Title'))
+            ->notEmptyString('title', __('Please enter a Title'), 'create')
             ->requirePresence('comment', 'create')
-            ->notEmptyString('comment', __('Please enter a Comment'))
+            ->notEmptyString('comment', __('Please enter a Comment'), 'create')
             ->requirePresence('comment_date', 'create')
             ->notEmptyDate('comment_date', __('Please select a Date'));
     }
