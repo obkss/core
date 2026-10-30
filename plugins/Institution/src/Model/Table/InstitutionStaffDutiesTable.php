@@ -54,7 +54,10 @@ class InstitutionStaffDutiesTable extends ControllerActionTable
 			->add('staff_duties_id', 'not-blank', ['rule' => 'notBlank', 'message' => __('Please select a Duty Type')])
 			->requirePresence('staff_id', 'create', __('Please select a Staff'))
 			->notEmptyString('staff_id', __('Please select a Staff'))
-			->add('staff_id', 'not-blank', ['rule' => 'notBlank', 'message' => __('Please select a Staff')]);
+			// academic_period_id is NOT NULL with the same FK -> 404 risk; the dropdown has no empty
+			// option, so this only guards blank/tampered posts
+			->requirePresence('academic_period_id', 'create', __('Please select an Academic Period'))
+			->notEmptyString('academic_period_id', __('Please select an Academic Period'));
 	}
 
     // POCOR-9768: Application Rule (not a Validator rule) so this is enforced on every save() —
