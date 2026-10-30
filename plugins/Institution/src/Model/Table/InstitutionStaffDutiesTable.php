@@ -46,8 +46,15 @@ class InstitutionStaffDutiesTable extends ControllerActionTable
     public function validationDefault(Validator $validator): Validator {
 		$validator = parent::validationDefault($validator);
 
+		// POCOR-9897: staff_id had no rule, so a blank Staff reached the insert and failed the
+		// security_users FK (rendered as error404). Validate it like Duty Type, with messages
+		// (the MessagesTrait lookup for these keys does not exist -> "[Message Not Found]").
 		return $validator
-			->add('staff_duties_id', 'not-blank', ['rule' => 'notBlank']);
+			->notEmptyString('staff_duties_id', __('Please select a Duty Type'))
+			->add('staff_duties_id', 'not-blank', ['rule' => 'notBlank', 'message' => __('Please select a Duty Type')])
+			->requirePresence('staff_id', 'create', __('Please select a Staff'))
+			->notEmptyString('staff_id', __('Please select a Staff'))
+			->add('staff_id', 'not-blank', ['rule' => 'notBlank', 'message' => __('Please select a Staff')]);
 	}
 
     // POCOR-9768: Application Rule (not a Validator rule) so this is enforced on every save() —
