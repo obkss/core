@@ -9,6 +9,7 @@ use Cake\ORM\Query;
 use Cake\Event\EventInterface;
 use Cake\Validation\Validator;
 use Cake\ORM\RulesChecker;
+use Cake\Log\Log;
 use App\Model\Table\ControllerActionTable;
 
 class InstitutionStaffDutiesTable extends ControllerActionTable
@@ -452,7 +453,11 @@ class InstitutionStaffDutiesTable extends ControllerActionTable
 
         foreach ($activeDuties as $dutyRecord) {
             $dutyRecord->status = self::STATUS_INACTIVE;
-            $this->save($dutyRecord);
+            // POCOR-9878: a failed save would leave the duty active with its role — make it visible
+            if (!$this->save($dutyRecord)) {
+                Log::error('InstitutionStaffDuties::deactivateDuties() failed for duty id ' . $dutyRecord->id
+                    . ': ' . json_encode($dutyRecord->getErrors()));
+            }
         }
     }
 
