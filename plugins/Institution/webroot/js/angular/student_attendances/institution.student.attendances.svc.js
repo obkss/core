@@ -1199,8 +1199,17 @@ function InstitutionStudentAttendancesSvc(
                         // console.log('Step 19: Checking api...', api ? 'EXISTS' : 'UNDEFINED');
 
                         // POCOR-9572: Refresh cells to show updated values
+                        // POCOR-9890: force-refresh the whole row. A plain refreshCells() only
+                        // redraws cells whose own value changed, so the Reason/Comment cell kept
+                        // its old layout (e.g. Excused reason select + comment) while the row
+                        // height changed, which broke the layout.
                         // console.log('Step 20: Calling refreshCells()...');
-                        api.refreshCells();
+                        var rowNode = api.getRowNode(String(data.student_id));
+                        if (rowNode) {
+                            api.refreshCells({ rowNodes: [rowNode], force: true });
+                        } else {
+                            api.refreshCells();
+                        }
                         // console.log('Step 21: Cells refreshed successfully');
 
                         // POCOR-9572: Reset row heights so they adjust to content
