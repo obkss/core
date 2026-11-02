@@ -15,15 +15,30 @@ use Migrations\AbstractMigration;
  * separate CakePHP Table classes plus a completely separate Laravel API
  * (api/app/Repositories/AttendanceRepository.php, raw Eloquent insert - no
  * CakePHP hook can intercept it). A DB trigger is the only mechanism that
- * guarantees this can never recur regardless of which code path writes - same
- * reasoning and pattern as the POCOR-9759 weight-snapshot triggers.
+ * guarantees this can never recur regardless of which code path writes.
+ *
+ * Known follow-ups, intentionally not handled here (see code review on
+ * POCOR-9892): ImportStudentAttendancesTable.php and the Laravel API's
+ * StudentRepository.php both pass a client-supplied reason straight through
+ * for non-Excused rows with no validation - these triggers now silently null
+ * that value rather than the caller being told. Also, already-archived
+ * records (see StudentAttendancesTable.php's ArchiveConnections usage) are
+ * not touched by this migration or these triggers.
  */
 class POCOR9892 extends AbstractMigration
 {
     public function up()
     {
+        // Only backs up the rows this migration actually changes (not the whole
+        // table) - down() still works unchanged, since it matches on the full
+        // composite key and simply finds fewer backup rows to restore.
         $this->execute('CREATE TABLE IF NOT EXISTS `zz_9892_institution_student_absence_details` LIKE `institution_student_absence_details`');
-        $this->execute('INSERT INTO `zz_9892_institution_student_absence_details` SELECT * FROM `institution_student_absence_details`');
+        $this->execute("
+            INSERT INTO `zz_9892_institution_student_absence_details`
+            SELECT d.* FROM `institution_student_absence_details` d
+            INNER JOIN `absence_types` t ON t.id = d.absence_type_id
+            WHERE t.code != 'EXCUSED' AND d.student_absence_reason_id IS NOT NULL
+        ");
 
         $this->execute('
             UPDATE `institution_student_absence_details` d
