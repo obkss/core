@@ -11,10 +11,10 @@ return [
     'Datasources' => [
         'default' => [
             'className' => 'Cake\Database\Connection',
-            'driver' => 'Cake\Database\Driver\Postgres',
+            'driver' => 'Cake\Database\Driver\Mysql',
             'persistent' => false,
             'host' => 'localhost',
-            'port' => '5432',
+            'port' => '3306',
             'username' => 'root',
             'password' => '',
             'database' => '',
