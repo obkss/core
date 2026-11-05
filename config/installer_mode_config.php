@@ -5,7 +5,6 @@
 			'census' => false,
 			'school' => false,
 			'vaccinations' => false
-			'installer_mode' => false,
 
 	);
 
