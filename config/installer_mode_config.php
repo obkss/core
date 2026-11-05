@@ -5,6 +5,8 @@
 			'census' => false,
 			'school' => false,
 			'vaccinations' => false
+			'installer_mode' => false,
+
 	);
 
 	$count_mode_value = array_sum($mode);
