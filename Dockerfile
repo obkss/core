@@ -89,5 +89,7 @@ COPY ./docker-config/init.sh /usr/bin/init.sh
 COPY ./docker-config/cron/openemis-core /etc/cron.d/openemis-core
 RUN chmod 0644 /etc/cron.d/openemis-core
 
+RUN chmod +x /usr/bin/init.sh
+
 # Container Start Command
 CMD ["/usr/bin/init.sh"]
